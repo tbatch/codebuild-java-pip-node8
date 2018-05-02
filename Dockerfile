@@ -10,7 +10,8 @@
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
-FROM ubuntu:14.04.5
+#FROM ubuntu:14.04.5
+FROM node:9-slim
 
 # Building git from source code:
 #   Ubuntu's default git package is built with broken gnutls. Rebuild git with openssl.
@@ -23,7 +24,6 @@ RUN apt-get update \
        liblzma-dev libmagickcore-dev libmagickwand-dev libmysqlclient-dev libncurses-dev libpng-dev \
        libpq-dev libreadline-dev libsqlite3-dev libssl-dev libtool libwebp-dev libxml2-dev libxslt-dev \
        libyaml-dev make patch xz-utils zlib1g-dev unzip curl \
-       default-jre \
     && apt-get -qy build-dep git \
     && apt-get -qy install libcurl4-openssl-dev git-man liberror-perl \
     && mkdir -p /usr/src/git-openssl \
@@ -39,6 +39,17 @@ RUN apt-get update \
 # on the public repos.
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
+
+# Install Oracle Java 8
+RUN  echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
+    echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee /etc/apt/sources.list.d/webupd8team-java.list &&\
+    echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list &&\
+    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886 &&\
+    apt-get update &&\
+    apt-get install -y oracle-java8-installer
+
+# Set java_home variable
+ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
 RUN wget "https://bootstrap.pypa.io/get-pip.py" -O /tmp/get-pip.py \
     && python /tmp/get-pip.py \
