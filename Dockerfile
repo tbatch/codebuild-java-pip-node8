@@ -38,23 +38,23 @@ RUN apt-get update \
 # Install dependencies by all python images equivalent to buildpack-deps:jessie
 # on the public repos.
     && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean
+    && apt-get clean \
 
 # Install Oracle Java 8
-RUN  echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
-    echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee /etc/apt/sources.list.d/webupd8team-java.list &&\
-    echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list &&\
-    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886 &&\
-    apt-get update &&\
-    apt-get install -y oracle-java8-installer
-
-# Set java_home variable
-ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
-
-RUN wget "https://bootstrap.pypa.io/get-pip.py" -O /tmp/get-pip.py \
+    && echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections \
+    && echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee /etc/apt/sources.list.d/webupd8team-java.list \
+    && echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list \
+    && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886 &&\
+    && apt-get update &&\
+    && apt-get install -y oracle-java8-installer \
+# Install pip
+    && wget "https://bootstrap.pypa.io/get-pip.py" -O /tmp/get-pip.py \
     && python /tmp/get-pip.py \
     && pip install awscli==1.11.25 \
     && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/* 
+
+# Set java_home variable
+ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
 ENV NODE_VERSION="8.10.0"
 
